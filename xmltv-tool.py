@@ -136,9 +136,7 @@ def main(inspect: ('print stats about the files instead of the resulting file. E
         *xmltv_files):
     """
     Utility to inspect and manipulate XMLTV files.
-
     If -i, -c or -d are used, a summary of the input files is printed. Otherwise a resulting processed XMLTV is printed.
-
     Input files are merged into one before processing and printed as a valid merged XMLTV file.
     """
 
@@ -237,7 +235,7 @@ def main(inspect: ('print stats about the files instead of the resulting file. E
         for programme_elem in xmltv.findall('./programme'): 
             date_string = (filter_date + ' +0100')
             if 'start' in programme_elem.attrib:
-                if programme_elem.attrib['start'] >= date_string and programme_elem:
+                if programme_elem.attrib['start'] >= date_string and programme_elem.attrib['start'] <= date_string:
                     xmltv.remove(programme_elem)
             else:
                 print_warning('programme element without id ' + programme_elem.tostring())
@@ -283,3 +281,5 @@ if  __name__ == '__main__':
     except IsADirectoryError as e:
         print(e)
 
+Contact GitHub API Training Shop Blog About
+© 2016 GitHub, Inc. Terms Privacy Security Status Help
