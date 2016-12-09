@@ -108,22 +108,6 @@ def do_print_programs(xmltv, duration_instead_of_stop):
             else:
                 print('{0}  {1} {2}\t - {3}'.format(str(start), stop, channel, title))
 				
-def do_print_date(xmltv, duration_instead_of_stop):
-    programs = xmltv.findall('./programme')
-
-    for program in programs:
-        start = parse_time(program.attrib['start']).strftime('%a %Y-%m-%d %H:%M %z')
-        stop = parse_time(program.attrib['stop']).strftime('%a %Y-%m-%d %H:%M %z')
-        channel = program.attrib['channel']
-        title = get_program_title(program)
-        if title is None:
-            print('{0}  {1}'.format(str(start), channel))
-        else:
-            if duration_instead_of_stop:
-                print('{0}  {1}\t - {2} {3}'.format(str(start), channel, get_program_duration(program), title))
-            else:
-                print('{0}  {1} {2}\t - {3}'.format(str(start), stop, channel, title))
-
 def xmltv_add_program(xmltv, program):
     xmltv.append(program)
 
@@ -144,7 +128,7 @@ def main(inspect: ('print stats about the files instead of the resulting file. E
         print_programs: ('inspect programs. implies -i', 'flag', 'p'),
         filter_channels: ('filter by channels id (comma separated)', 'option', 'C'),
         filter_channels_file: ('filter by channels id loading channels from the file (one per line)', 'option', 'f'),
-		filter_date: ('filter by date and time', 'option', 'j'),
+	filter_date: ('filter by date and time', 'option', 'j'),
         shift_time_onwards: ('shift the start time dates onwards. Accepts time definitions as: 1d, 3M, 6y, 4w.','option','s'),
         shift_time_backwards: ('shift the start time dates backwards. Accepts time definitions as --shift-time-onwards.','option','S'),
         utc: ('normalize start time to UTC','flag','u'),
@@ -250,10 +234,10 @@ def main(inspect: ('print stats about the files instead of the resulting file. E
                 print_warning('programme element without id ' + programme_elem.tostring())
 
     if filter_date:
-		date_transformations = [t.strip() for t in filter_date.split(' ')]
-        for programme_elem in xmltv.findall('./programme'):
+        for programme_elem in xmltv.findall('./programme'): 
+            date_string = (filter_date + ' +0100')
             if 'start' in programme_elem.attrib:
-                if programme_elem.attrib['start'] not in date_transformations:
+                if programme_elem.attrib['start'] >= date_string and programme_elem:
                     xmltv.remove(programme_elem)
             else:
                 print_warning('programme element without id ' + programme_elem.tostring())
@@ -287,9 +271,6 @@ def main(inspect: ('print stats about the files instead of the resulting file. E
     if print_programs:
             do_print_programs(xmltv, print_duration)
 	
-	if print_date:
-            do_print_date(xmltv, print_duration)
-
     if not print_days and not print_channels and not print_programs:
        print(ET.tostring(xmltv, pretty_print=True).decode('utf-8'))
 
